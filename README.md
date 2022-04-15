@@ -67,8 +67,16 @@ MessagePack has a compact binary size and a full set of general purpose expressi
 
 This library is distributed via NuGet. Special [Unity support](#unity) is available, too.
 
+이 라이브러리는 NuGet을 통해 배포됩니다. 특별 [유니티 지원](#unity)도 가능합니다. 69
+
 We target .NET Standard 2.0 with special optimizations for .NET Core 2.1+, making it compatible with most reasonably recent .NET runtimes such as Core 2.0 and later, Framework 4.6.1 and later, Mono 5.4 and later and Unity 2018.3 and later.
+
+.NET Core 2.1 이상에 대한 특수 최적화를 통해 .NET Standard 2.0을 대상으로 하여 Core 2.0 이상, Framework 4.6.1 이상, Mono 5.4 이상, Unity 2018.3 이상과 같은 가장 합리적인 최신 .NET 런타임과 호환되도록 합니다. 72
+
 The library code is pure C# (with Just-In-Time IL code generation on some platforms).
+
+라이브러리 코드는 순수 C#입니다(일부 플랫폼에서 Just-In-Time IL 코드 생성 포함). 75
+
 
 ### NuGet packages
 
@@ -80,11 +88,16 @@ Install-Package MessagePack
 
 Install the optional C# [analyzers](doc/analyzers/index.md) package to get warnings about coding mistakes and automatic fix suggestions to save you time:
 
+선택적 C# [analyzers](doc/analyzers/index.md) 패키지를 설치하여 코딩 실수에 대한 경고와 시간 절약을 위한 자동 수정 제안을 받으세요.
+
 ```ps1
 Install-Package MessagePackAnalyzer
 ```
 
 There are also a range of official and third party Extension Packages available (learn more in our [extensions section](#extensions)):
+
+또한 다양한 공식 및 타사 확장 패키지를 사용할 수 있습니다(자세한 내용은 [확장 섹션](#extensions) 참조). 98
+
 
 ```ps1
 Install-Package MessagePack.ReactiveProperty
@@ -96,6 +109,9 @@ Install-Package MessagePack.AspNetCoreMvcFormatter
 
 For Unity projects, the [releases][Releases] page provides downloadable `.unitypackage` files. When using in Unity IL2CPP or Xamarin AOT environments, please carefully read the [pre-code generation section](#aot).
 
+Unity 프로젝트의 경우 [릴리스][릴리스] 페이지에서 다운로드 가능한 `.unitypackage` 파일을 제공합니다. Unity IL2CPP 또는 Xamarin AOT 환경에서 사용할 경우 [사전 코드 생성 섹션](#aot)을 주의 깊게 읽으십시오. 111
+
+
 ### Migration notes from v1.x
 
 If you were using MessagePack for C# v1.x, check out the ["How to update to our new v2.x version"](doc/migration.md) document.
@@ -103,7 +119,10 @@ If you were using MessagePack for C# v1.x, check out the ["How to update to our 
 ## Quick Start
 
 Define the struct or class to be serialized and annotate it with a `[MessagePackObject]` attribute.
+직렬화할 구조체 또는 클래스를 정의하고 `[MessagePackObject]` 속성으로 주석을 답니다. 122
 Annotate members whose values should be serialized (fields as well as properties) with `[Key]` attributes.
+값을 직렬화해야 하는 멤버(필드 및 속성)를 `[Key]` 속성으로 주석을 답니다. 124
+
 
 ```csharp
 [MessagePackObject]
@@ -128,7 +147,13 @@ public class MyClass
 ```
 
 Call `MessagePackSerializer.Serialize<T>/Deserialize<T>` to serialize/deserialize your object instance.
+
+`MessagePackSerializer.Serialize<T>/Deserialize<T>`를 호출하여 개체 인스턴스를 직렬화/역직렬화합니다. 150
+
 You can use the `ConvertToJson` method to get a human readable representation of any MessagePack binary blob.
+
+'ConvertToJson' 메서드를 사용하여 사람이 읽을 수 있는 MessagePack 바이너리 blob을 얻을 수 있습니다. 153
+
 
 ```csharp
 class Program
@@ -158,9 +183,14 @@ class Program
 
 By default, a `MessagePackObject` annotation is required. This can be made optional; see the [Object Serialization section](#object-serialization) and the [Formatter Resolver section](#resolvers) for details.
 
+기본적으로 'MessagePackObject' 주석이 필요합니다. 이것은 선택 사항으로 만들 수 있습니다. 자세한 내용은 [Object Serialization 섹션](#object-serialization) 및 [Formatter Resolver 섹션](#resolvers)을 참조하세요. 185
+
+
 ## Analyzer
 
 The MessagePackAnalyzer package aids with:
+
+MessagePackAnalyzer 패키지는 다음을 지원합니다. 192
 
 1. Automating definitions for your serializable objects.
 1. Produces compiler warnings upon incorrect attribute use, member accessibility, and more.
