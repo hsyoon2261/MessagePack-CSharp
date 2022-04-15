@@ -193,11 +193,15 @@ The MessagePackAnalyzer package aids with:
 MessagePackAnalyzer 패키지는 다음을 지원합니다. 192
 
 1. Automating definitions for your serializable objects.
-1. Produces compiler warnings upon incorrect attribute use, member accessibility, and more.
+2. Produces compiler warnings upon incorrect attribute use, member accessibility, and more.
+ 잘못된 속성 사용, 멤버 액세스 가능성 등에 대해 컴파일러 경고를 생성합니다. 197
+
 
 ![analyzergif](https://cloud.githubusercontent.com/assets/46207/23837445/ce734eae-07cb-11e7-9758-d69f0f095bc1.gif)
 
 If you want to allow a specific custom type (for example, when registering a custom type), put `MessagePackAnalyzer.json` at the project root and change the Build Action to `AdditionalFiles`.
+
+특정 사용자 정의 유형(예: 사용자 정의 유형 등록 시)을 허용하려면 프로젝트 루트에 'MessagePackAnalyzer.json'을 넣고 Build Action을 'AdditionalFiles'로 변경합니다.
 
 ![image](https://cloud.githubusercontent.com/assets/46207/23837427/8a8d507c-07cb-11e7-9277-5a566eb0bfde.png)
 
@@ -238,11 +242,23 @@ Please see the [extensions section](#extensions).
 
 `MessagePack.Nil` is the built-in type representing null/void in MessagePack for C#.
 
-## Object Serialization
+'MessagePack.Nil'은 C#용 MessagePack에서 null/void를 나타내는 기본 제공 형식입니다. 244
 
-MessagePack for C# can serialize your own public `class` or `struct` types. By default, serializable types must be annotated with the `[MessagePackObject]` attribute and members with the `[Key]` attribute. Keys can be either indexes (`int`) or arbitrary strings. If all keys are indexes, arrays are used for serialization, which offers advantages in performance and binary size. Otherwise, MessagePack maps (dictionaries) will be used.
+
+## Object Serialization 객체 직렬화
+
+MessagePack for C# can serialize your own public `class` or `struct` types. By default, serializable types must be annotated with the `[MessagePackObject]` attribute and members with the `[Key]` attribute. 
+
+C#용 MessagePack은 자신의 공개 '클래스' 또는 '구조체' 유형을 직렬화할 수 있습니다. 기본적으로 직렬화 가능한 유형은 `[MessagePackObject]` 속성으로 주석을 달고 멤버는 `[Key]` 속성으로 주석을 달아야 합니다.
+
+Keys can be either indexes (`int`) or arbitrary strings. If all keys are indexes, arrays are used for serialization, which offers advantages in performance and binary size. Otherwise, MessagePack maps (dictionaries) will be used.
+
+키는 인덱스(`int`) 또는 임의의 문자열일 수 있습니다. 모든 키가 인덱스인 경우 직렬화에 배열이 사용되므로 성능 및 바이너리 크기 면에서 이점이 있습니다. 그렇지 않으면 MessagePack 맵(사전)이 사용됩니다.
+
 
 If you use `[MessagePackObject(keyAsPropertyName: true)]`, then members do not require explicit `Key` attributes, but string keys will be used.
+
+`[MessagePackObject(keyAsPropertyName: true)]`를 사용하는 경우 멤버는 명시적인 `Key` 속성을 필요로 하지 않지만 문자열 키가 사용됩니다. 260
 
 ```csharp
 [MessagePackObject]
@@ -286,15 +302,29 @@ Console.WriteLine(MessagePackSerializer.SerializeToJson(new Sample3 { Foo = 10, 
 
 All public instance members (fields as well as properties) will be serialized. If you want to ignore certain public members, annotate the member with a `[IgnoreMember]` attribute.
 
+모든 공개 인스턴스 멤버(필드 및 속성)는 직렬화됩니다. 특정 공개 멤버를 무시하려면 `[IgnoreMember]` 속성으로 멤버에 주석을 답니다. 304
+
 Please note that any serializable struct or class must have public accessibility; private and internal structs and classes cannot be serialized!
 The default of requiring `MessagePackObject` annotations is meant to enforce explicitness and therefore may help write more robust code.
+
+직렬화 가능한 구조체 또는 클래스에는 공용 액세스 가능성이 있어야 합니다. private 및 내부 구조체와 클래스는 직렬화할 수 없습니다! 308
+'MessagePackObject' 주석을 요구하는 기본값은 명시성을 적용하기 위한 것이며 따라서 더 강력한 코드를 작성하는 데 도움이 될 수 있습니다. 309
+
 
 Should you use an indexed (`int`) key or a string key?
 We recommend using indexed keys for faster serialization and a more compact binary representation than string keys.
 However, the additional information in the strings of string keys can be quite useful when debugging.
 
+번역 결과
+인덱싱된(`int`) 키 또는 문자열 키를 사용해야 합니까?
+더 빠른 직렬화와 문자열 키보다 더 간결한 이진 표현을 위해 인덱싱된 키를 사용하는 것이 좋습니다.
+그러나 문자열 키 문자열의 추가 정보는 디버깅할 때 매우 유용할 수 있습니다.
+
 When classes change or are extended, be careful about versioning. `MessagePackSerializer` will initialize members to their `default` value if a key does not exist in the serialized binary blob, meaning members using reference types can be initialized to `null`.
 If you use indexed (`int`) keys, the keys should start at 0 and should be sequential. If a later version stops using certain members, you should keep the obsolete members (C# provides an `Obsolete` attribute to annotate such members) until all other clients had a chance to update and remove their uses of these members as well. Also, when the values of indexed keys "jump" a lot, leaving gaps in the sequence, it will negatively affect the binary size, as `null` placeholders will be inserted into the resulting arrays. However, you shouldn't reuse indexes of removed members to avoid compatibility issues between clients or when trying to deserialize legacy blobs.
+
+클래스가 변경되거나 확장될 때 버전 관리에 주의하십시오. 'MessagePackSerializer'는 직렬화된 바이너리 blob에 키가 없으면 멤버를 '기본' 값으로 초기화합니다. 즉, 참조 유형을 사용하는 멤버는 'null'로 초기화될 수 있습니다.
+인덱싱된(`int`) 키를 사용하는 경우 키는 0에서 시작하고 순차적이어야 합니다. 이후 버전이 특정 멤버의 사용을 중지하는 경우 다른 모든 클라이언트가 이러한 멤버의 사용을 업데이트하고 제거할 기회가 있을 때까지 더 이상 사용되지 않는 멤버를 유지해야 합니다(C#은 이러한 멤버에 주석을 달기 위해 'Obsolete' 속성을 제공함). 또한 인덱싱된 키의 값이 많이 "점프"되어 시퀀스에 간격이 남으면 'null' 자리 표시자가 결과 배열에 삽입되므로 바이너리 크기에 부정적인 영향을 미칩니다. 그러나 클라이언트 간의 호환성 문제를 방지하거나 레거시 Blob을 역직렬화하려고 할 때 제거된 구성원의 인덱스를 재사용해서는 안 됩니다.
 
 Example of index gaps and resulting placeholders:
 
@@ -313,6 +343,8 @@ Console.WriteLine(MessagePackSerializer.SerializeToJson(new IntKeySample()));
 ```
 
 If you do not want to explicitly annotate with the `MessagePackObject`/`Key` attributes and instead want to use MessagePack for C# more like e.g. [Json.NET](https://github.com/JamesNK/Newtonsoft.Json), you can make use of the contractless resolver.
+
+`MessagePackObject`/`Key` 속성으로 명시적으로 주석을 달고 싶지 않고 대신 C#용 MessagePack을 사용하려는 경우 [Json.NET](https://github.com/JamesNK/Newtonsoft.Json)에서는 무계약 리졸버를 사용할 수 있습니다.
 
 ```csharp
 public class ContractlessSample
@@ -338,6 +370,9 @@ var bin2 = MessagePackSerializer.Serialize(data);
 ```
 
 If you want to serialize private members as well, you can use one of the `*AllowPrivate` resolvers.
+
+비공개 멤버도 직렬화하려면 `*AllowPrivate` 해석기 중 하나를 사용할 수 있습니다. 373
+
 
 ```csharp
 [MessagePackObject]
@@ -371,6 +406,10 @@ If you want to use MessagePack for C# more like a BinaryFormatter with a typeles
 
 Resolvers are the way to add specialized support for custom types to MessagePack for C#. Please refer to the [Extension point section](#resolvers).
 
+유형이 없는 직렬화 API가 있는 BinaryFormatter처럼 C#용 MessagePack을 사용하려면 유형이 없는 해석기와 도우미를 사용하십시오. [Typeless 섹션](#typeless)을 참조하십시오.
+
+해석기는 C#용 MessagePack에 사용자 지정 유형에 대한 특수 지원을 추가하는 방법입니다. [확장 포인트 섹션](#resolvers)을 참조하십시오.
+
 ## DataContract compatibility
 
 You can use `[DataContract]` annotations instead of `[MessagePackObject]` ones. If type is annotated with `DataContract`, you can use `[DataMember]` annotations instead of `[Key]` ones and `[IgnoreDataMember]` instead of `[IgnoreMember]`.
@@ -379,9 +418,17 @@ Then `[DataMember(Order = int)]` will behave the same as `[Key(int)]`, `[DataMem
 
 Using `DataContract`, e.g. in shared libraries, makes your classes/structs independent from MessagePack for C# serialization. However, it is not supported by the analyzers nor in code generation by the `mpc` tool. Also, features like `UnionAttribute`, `MessagePackFormatter`, `SerializationConstructor`, etc can not be used. Due to this, we recommend that you use the specific MessagePack for C# annotations when possible.
 
+`[MessagePackObject]` 주석 대신 `[DataContract]` 주석을 사용할 수 있습니다. 유형이 `DataContract`로 주석 처리된 경우 `[Key]` 대신 `[DataMember]` 주석을, `[IgnoreMember]` 대신 `[IgnoreDataMember]`를 사용할 수 있습니다.
+
+그러면 `[DataMember(Order = int)]`는 `[Key(int)]`와 동일하게 작동하고, `[DataMember(Name = string)]`는 `[Key(string)]`과 동일하게, `[ DataMember]`는 `[Key(nameof(member name)]`과 동일합니다.
+
+`DataContract` 사용, 예: 공유 라이브러리에서 클래스/구조체를 C# 직렬화용 MessagePack과 독립적으로 만듭니다. 그러나 분석기나 'mpc' 도구에 의한 코드 생성에서는 지원되지 않습니다. 또한 `UnionAttribute`, `MessagePackFormatter`, `SerializationConstructor` 등과 같은 기능을 사용할 수 없습니다. 이 때문에 가능한 경우 특정 C# 주석용 MessagePack을 사용하는 것이 좋습니다.
+
 ## Serializing readonly/immutable object members  (SerializationConstructor)
 
 MessagePack for C# supports serialization of readonly/immutable objects/members. For example, this struct can be serialized and deserialized.
+
+C#용 MessagePack은 읽기 전용/불변 개체/멤버의 직렬화를 지원합니다. 예를 들어, 이 구조체는 직렬화 및 역직렬화될 수 있습니다.
 
 ```csharp
 [MessagePackObject]
@@ -409,6 +456,9 @@ var point = MessagePackSerializer.Deserialize<Point>(bin);
 `MessagePackSerializer` will choose the constructor with the best matched argument list, using argument indexes index for index keys, or parameter names for string keys. If it cannot determine an appropriate constructor, a `MessagePackDynamicObjectResolverException: can't find matched constructor parameter` exception will be thrown.
 You can specify which constructor to use manually with a `[SerializationConstructor]` annotation.
 
+'MessagePackSerializer'는 인덱스 키의 경우 인수 인덱스 인덱스를 사용하거나 문자열 키의 경우 매개변수 이름을 사용하여 가장 일치하는 인수 목록이 있는 생성자를 선택합니다. 적절한 생성자를 결정할 수 없으면 `MessagePackDynamicObjectResolverException: 일치하는 생성자 매개변수를 찾을 수 없음` 예외가 발생합니다.
+`[SerializationConstructor]` 주석으로 수동으로 사용할 생성자를 지정할 수 있습니다.
+
 ```csharp
 [MessagePackObject]
 public struct Point
@@ -434,7 +484,7 @@ public struct Point
 }
 ```
 
-### C# 9 `record` types
+### C# 9 `record` types C9은 나중에 보자.. 
 
 C# 9.0 record with primary constructor is similar immutable object, also supports serialize/deserialize.
 
@@ -464,9 +514,12 @@ As a result, you should avoid using `init` on property setters in generic classe
 
 When using the `DynamicObjectResolverAllowPrivate`/`StandardResolverAllowPrivate` resolver the bug does not apply and you may use `init` without restriction.
 
-## Serialization Callback
+## Serialization Callback 직렬화 콜백
 
 Objects implementing the `IMessagePackSerializationCallbackReceiver` interface will received `OnBeforeSerialize` and `OnAfterDeserialize` calls during serialization/deserialization.
+
+`IMessagePackSerializationCallbackReceiver` 인터페이스를 구현하는 객체는 직렬화/역직렬화 중에 `OnBeforeSerialize` 및 `OnAfterDeserialize` 호출을 수신합니다.
+
 
 ```csharp
 [MessagePackObject]
@@ -487,9 +540,11 @@ public class SampleCallback : IMessagePackSerializationCallbackReceiver
 }
 ```
 
-## Union
+## Union (ㅇ?유?니온? 이 )
 
 MessagePack for C# supports serializing interface-typed and abstract class-typed objects. It behaves like `XmlInclude` or `ProtoInclude`. In MessagePack for C# these are called `Union`. Only interfaces and abstracts classes are allowed to be annotated with `Union` attributes. Unique union keys are required.
+
+C#용 MessagePack은 인터페이스 유형 및 추상 클래스 유형 개체 직렬화를 지원합니다. `XmlInclude` 또는 `ProtoInclude`처럼 작동합니다. C#용 MessagePack에서는 이를 'Union'이라고 합니다. 인터페이스 및 추상 클래스에만 'Union' 속성으로 주석을 추가할 수 있습니다. 고유한 유니온 키가 필요합니다.
 
 ```csharp
 // Annotate inheritance types
@@ -537,7 +592,7 @@ switch (reData)
 }
 ```
 
-Unions are internally serialized to two-element arrays.
+Unions are internally serialized to two-element arrays.Union은 내부적으로 2요소 배열로 직렬화됩니다. 
 
 ```csharp
 IUnionSample data = new BarClass { OPQ = "FooBar" };
@@ -578,9 +633,13 @@ public class SubUnionType2 : ParentUnionType
 
 Please be mindful that you cannot reuse the same keys in derived types that are already present in the parent type, as internally a single flat array or map will be used and thus cannot have duplicate indexes/keys.
 
-## Dynamic (Untyped) Deserialization
+내부적으로 단일 평면 배열 또는 맵이 사용되므로 중복 인덱스/키를 가질 수 없으므로 상위 유형에 이미 있는 파생 유형에서 동일한 키를 재사용할 수 없습니다. 유의하십시오
+
+## Dynamic (Untyped) Deserialization 동적할당 자료형 역직렬화
 
 When calling `MessagePackSerializer.Deserialize<object>` or `MessagePackSerializer.Deserialize<dynamic>`, any values present in the blob will be converted to primitive values, i.e. `bool`, `char`, `sbyte`, `byte`, `short`, `int`, `long`, `ushort`, `uint`, `ulong`, `float`, `double`, `DateTime`, `string`, `byte[]`, `object[]`, `IDictionary<object, object>`.
+
+`MessagePackSerializer.Deserialize<object>` 또는 `MessagePackSerializer.Deserialize<dynamic>`을 호출하면 blob에 있는 모든 값이 원시 값(예: `bool`, `char`, `sbyte`, `byte`)으로 변환됩니다. `short`, `int`, `long`, `ushort`, `uint`, `ulong`, `float`, `double`, `DateTime`, `string`, `byte[]`, `object[] `, `IDictionary<객체, 객체>`.
 
 ```csharp
 // Sample blob.
@@ -598,7 +657,10 @@ Console.WriteLine(dynamicModel["Items"][2]); // 100
 Exploring object trees using the dictionary indexer syntax is the fastest option for untyped deserialization, but it is tedious to read and write.
 Where performance is not as important as code readability, consider deserializing with [ExpandoObject](doc/ExpandoObject.md).
 
-## Object Type Serialization
+사전 인덱서 구문을 사용하여 개체 트리를 탐색하는 것은 형식화되지 않은 역직렬화를 위한 가장 빠른 옵션이지만 읽고 쓰는 것은 지루합니다.
+성능이 코드 가독성만큼 중요하지 않은 경우 [ExpandoObject](doc/ExpandoObject.md)를 사용한 역직렬화를 고려하십시오.
+
+## Object Type Serialization 객체 형식 직렬화 ㅎ..
 
 `StandardResolver` and `ContractlessStandardResolver` can serialize `object`/anonymous typed objects.
 
@@ -624,6 +686,9 @@ When deserializing, the behavior will be the same as Dynamic (Untyped) Deseriali
 ## Typeless
 
 The typeless API is similar to `BinaryFormatter`, as it will embed type information into the blobs, so no types need to be specified explicitly when calling the API.
+
+유형이 없는 API는 'BinaryFormatter'와 유사합니다. 유형 정보를 Blob에 포함하므로 API를 호출할 때 유형을 명시적으로 지정할 필요가 없기 때문입니다. 689
+
 
 ```csharp
 object mc = new Sandbox.MyClass()
@@ -687,9 +752,18 @@ Deserializing data from an untrusted source can introduce security vulnerabiliti
 Depending on the settings used during deserialization, **untrusted data may be able to execute arbitrary code** or cause a denial of service attack.
 Untrusted data might come from over the network from an untrusted source (e.g. any and every networked client) or can be tampered with by an intermediary when transmitted over an unauthenticated connection, or from a local storage that might have been tampered with, or many other sources. MessagePack for C# does not provide any means to authenticate data or make it tamper-resistant. Please use an appropriate method of authenticating data before deserialization - such as a [`MAC`](https://en.wikipedia.org/wiki/Message_authentication_code) .
 
+신뢰할 수 없는 소스의 데이터를 역직렬화하면 애플리케이션에 보안 취약점이 발생할 수 있습니다.
+역직렬화 중에 사용된 설정에 따라 **신뢰할 수 없는 데이터가 임의의 코드를 실행**하거나 서비스 거부 공격을 일으킬 수 있습니다.
+신뢰할 수 없는 데이터는 신뢰할 수 없는 소스(예: 네트워크로 연결된 모든 클라이언트)에서 네트워크를 통해 가져오거나 인증되지 않은 연결을 통해 전송될 때 중개자에 의해 변조될 수 있습니다. 소스. C#용 MessagePack은 데이터를 인증하거나 변조 방지할 수 있는 수단을 제공하지 않습니다. [`MAC`](https://en.wikipedia.org/wiki/Message_authentication_code) 와 같이 역직렬화 전에 데이터를 인증하는 적절한 방법을 사용하세요.
+
+
 Please be very mindful of these attack scenarios; many projects and companies, and serialization library users in general, have been bitten by untrusted user data deserialization in the past.
 
 When deserializing untrusted data, put MessagePack into a more secure mode by configuring your `MessagePackSerializerOptions.Security` property:
+
+이러한 공격 시나리오에 매우 유의하십시오. 많은 프로젝트와 회사, 그리고 일반적으로 직렬화 라이브러리 사용자는 과거에 신뢰할 수 없는 사용자 데이터 역직렬화에 물렸습니다.
+
+신뢰할 수 없는 데이터를 역직렬화할 때 `MessagePackSerializerOptions.Security` 속성을 구성하여 MessagePack을 보다 안전한 모드로 전환합니다.
 
 ```cs
 var options = MessagePackSerializerOptions.Standard
@@ -706,6 +780,10 @@ You should also avoid the Typeless serializer/formatters/resolvers for untrusted
 
 The `UntrustedData` mode merely hardens against some common attacks, but is no fully secure solution in itself.
 
+또한 신뢰할 수 없는 데이터가 보안을 손상시킬 수 있는 예상치 못한 유형을 역직렬화할 가능성이 있으므로 신뢰할 수 없는 데이터에 대한 Typeless 직렬 변환기/포매터/리졸버를 피해야 합니다.
+
+'UntrustedData' 모드는 일부 일반적인 공격에 대해 강화할 뿐 그 자체로 완전히 안전한 솔루션은 아닙니다.
+
 ## Performance
 
 Benchmarks comparing MessagePack For C# to other serializers were run on `Windows 10 Pro x64 Intel Core i7-6700K 4.00GHz, 32GB RAM`. Benchmark code is [available here](https://github.com/neuecc/ZeroFormatter/tree/master/sandbox/PerformanceComparison) - and their [version info](https://github.com/neuecc/ZeroFormatter/blob/bc63cb925d/sandbox/PerformanceComparison/packages.config).
@@ -713,7 +791,7 @@ Benchmarks comparing MessagePack For C# to other serializers were run on `Window
 
 ![image](https://cloud.githubusercontent.com/assets/46207/23835765/55fe494e-07b0-11e7-98be-5e7a9411da40.png)
 
- MessagePack for C# uses many techniques to improve performance.
+ MessagePack for C# uses many techniques to improve performance. 성능을 높히기 위해 이런것들을 했구나.. 나중에 나도 성능 향상을 해야할 수도있으니 언제 읽어는보자.
 
 * The serializer uses `IBufferWriter<byte>` rather than `System.IO.Stream` to reduce memory overhead.
 * Buffers are rented from pools to reduce allocations, keeping throughput high through reduced GC pressure.
@@ -788,7 +866,9 @@ Extra note, this is serialization benchmark result.
 
  Of course, `IntKey` is fastest but `StringKey` also performs reasonably well.
 
-## LZ4 Compression
+## LZ4 Compression 
+
+LZ4: Yann Collet이 개발한 멀티코어를 지원하는 비손실 압축 알고리즘이다. 압축률은 기존 압축 알고리즘인 Deflate 등에 비해 낮지만 속도가 최대 10배 이상으로 매우 빠르다. C로 구현이 되어있고 BSD라이센스를 따른다. 다양한 프로그래밍 언어로 포팅되거나 바인딩되어있다.
 
 MessagePack is a fast and *compact* format but it is not compression. [LZ4](https://github.com/lz4/lz4) is an extremely fast compression algorithm, and using it MessagePack for C# can achieve extremely fast performance as well as extremely compact binary sizes!
 
